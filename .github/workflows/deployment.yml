@@ -28,6 +28,11 @@ jobs:
       run: |
         docker build -t techsoland:latest .
 
+    - name: Tag Docker image
+      run: |
+        REPOSITORY_URI=472462225461.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/techsoland
+        docker tag techsoland:latest $REPOSITORY_URI:latest
+
     - name: Push Docker image to ECR
       run: |
         REPOSITORY_URI=472462225461.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/techsoland
