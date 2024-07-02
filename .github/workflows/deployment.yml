@@ -3,7 +3,7 @@ name: Build and Push Docker Image to ECR
 on:
   push:
     branches:
-      - master  
+      - master  # or specify the branch you want to trigger the workflow
 
 jobs:
   build-and-push:
@@ -13,15 +13,6 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2
-
-    - name: Log in to Amazon ECR
-      id: ecr-login
-      uses: aws-actions/amazon-ecr-login@v1
-      with:
-        region: ${{ secrets.AWS_REGION }}
-    
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
@@ -29,16 +20,20 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: ${{ secrets.AWS_REGION }}
 
+    - name: Log in to Amazon ECR
+      run: |
+        aws ecr get-login-password --region ${{ secrets.AWS_REGION }} | docker login --username AWS --password-stdin 472462225461.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
+
     - name: Build Docker image
       run: |
         docker build -t techsoland:latest .
 
     - name: Tag Docker image
       run: |
-        REPOSITORY_URI=472462225461.dkr.ecr.$AWS_REGION.amazonaws.com/techsoland
+        REPOSITORY_URI=472462225461.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/techsoland
         docker tag techsoland:latest $REPOSITORY_URI:latest
 
     - name: Push Docker image to ECR
       run: |
-        REPOSITORY_URI=472462225461.dkr.ecr.$AWS_REGION.amazonaws.com/techsoland
+        REPOSITORY_URI=472462225461.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/techsoland
         docker push $REPOSITORY_URI:latest
