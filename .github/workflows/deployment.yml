@@ -35,5 +35,4 @@ jobs:
 
     - name: Push Docker image to ECR
       run: |
-        REPOSITORY_URI=472462225461.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/techsoland
         docker push $REPOSITORY_URI:latest
